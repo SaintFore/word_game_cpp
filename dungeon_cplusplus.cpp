@@ -96,6 +96,13 @@ class Game {
     Player player;
     std::vector<Monster *> monsters;
     Game(Player pPlayer) : player(pPlayer) {}
+    // 析构函数，对象生命周期结束后调用
+    ~Game() {
+        std::cout << "清扫战场中..." << std::endl;
+        for (Monster *mptr : monsters) {
+            delete mptr; // 释放创造的monster
+        }
+    }
     void start() {
         while (true) {
             playerAction();
