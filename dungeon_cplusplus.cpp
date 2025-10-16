@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 class Player;
@@ -44,10 +45,10 @@ class Player {
                   << attack << "]" << std::endl;
     }
     void takeDamage(int damage) { hp = hp - damage; }
-    void goAttack(std::vector<Monster *> &monsters) {
+    void goAttack(std::vector<std::unique_ptr<Monster>> &monsters) {
         int number = choeseMonster();
         if (number >= 0 && number < monsters.size()) {
-            Monster *&monster = monsters[number];
+            Monster *monster = monsters[number].get();
             monster->takeDamage(attack);
             std::cout << "[" + name + "]攻击了[" + monster->getName() + "]"
                       << std::endl;
@@ -94,15 +95,15 @@ class Game {
 
   public:
     Player player;
-    std::vector<Monster *> monsters;
+    std::vector<std::unique_ptr<Monster>> monsters;
     Game(Player pPlayer) : player(pPlayer) {}
     // 析构函数，对象生命周期结束后调用
-    ~Game() {
-        std::cout << "清扫战场中..." << std::endl;
-        for (Monster *mptr : monsters) {
-            delete mptr; // 释放创造的monster
-        }
-    }
+    // ~Game() {
+    //     std::cout << "清扫战场中..." << std::endl;
+    //     for (Monster *mptr : monsters) {
+    //         delete mptr; // 释放创造的monster
+    //     }
+    // }
     void start() {
         while (true) {
             playerAction();
@@ -138,7 +139,8 @@ class Game {
             monsters[i]->attackPlayer(player);
         }
     }
-    bool isOver(const std::vector<Monster *> &monsters, Player &player) {
+    bool isOver(const std::vector<std::unique_ptr<Monster>> &monsters,
+                Player &player) {
         if (monsters.size() == 0) {
             std::cout << "你讨伐了全部怪物! " << std::endl;
             return true;
@@ -154,12 +156,10 @@ int main() {
     std::cout << "Hello 地牢世界" << std::endl;
     Player p1("merlin", 100, 15);
     Game game(p1);
-    game.monsters.push_back(new Orc("兽人战士", 100, 5));
-    game.monsters.push_back(new Goblin("哥布林斥候", 30, 2));
-    game.monsters.push_back(new Goblin("哥布林斥候", 30, 2));
-    game.monsters.push_back(new Goblin("哥布林斥候", 30, 2));
-    game.monsters.push_back(new Goblin("哥布林斥候", 30, 2));
-
+    game.monsters.push_back(std::make_unique<Orc>("兽人战士", 100, 5));
+    game.monsters.push_back(std::make_unique<Goblin>("哥布林斥候", 30, 2));
+    game.monsters.push_back(std::make_unique<Goblin>("哥布林斥候", 30, 2));
+    game.monsters.push_back(std::make_unique<Goblin>("哥布林斥候", 30, 2));
     game.start();
 
     return 0;
