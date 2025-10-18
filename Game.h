@@ -19,4 +19,5 @@ class Game {
     Game(Player pPlayer);
     void start();
     void disAllMonsters(const std::vector<std::unique_ptr<Monster>> &monsters);
+    void removeMonster(std::vector<std::unique_ptr<Monster>> &monsters);
 };
